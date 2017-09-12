@@ -1,3 +1,5 @@
+[![Build Status](https://travis-ci.org/CorkHounds/Amazon-Alexa-Hello-World-Lambda.svg?branch=master)](https://travis-ci.org/CorkHounds/Amazon-Alexa-Hello-World-Lambda)
+
 # About
 
 This Hello World example demonstrates how to write a Skill for Amazon Alexa in Java as a AWS Lambda Function using Dialog Directives.
