@@ -59,7 +59,8 @@ public class HelloWorldSpeechlet implements Speechlet {
         return getWelcomeResponse();
     }
 
-    @Override
+    @SuppressWarnings("rawtypes")
+	@Override
     public SpeechletResponse onIntent(final IntentRequest request, final Session session)
             throws SpeechletException {
         log.info("onIntent requestId={}, sessionId={}", request.getRequestId(),
@@ -73,54 +74,99 @@ public class HelloWorldSpeechlet implements Speechlet {
 
         if ("HelloWorld".equals(intentName)) {
 
-            //If the IntentRequest dialog state is STARTED
+            //If the IntentRequest dialog state is STARTED and you accept Utterances that
+        	//allow a user to provide slots?  If not, you don't need to return the updatedIntent.
             if (dialogueState.equals(DialogState.STARTED)) {
-	        		 
+	        	
+            	//Create a new DialogIntent
 		        DialogIntent dialogIntent = new DialogIntent();
+		        
+		        //Set the name to match our intentName
 		        dialogIntent.setName(intentName);
+		        
+		        //Map over the Dialog Slots
+		        //We do this to ensure that we include any slots already provided by the user
 		        Map<String,DialogSlot> dialogSlots = new HashMap<String,DialogSlot>();
-		        	        
+		        
+		        //Set up an iterator
 		        Iterator iter = intent.getSlots().entrySet().iterator();
 		        
 	            log.debug("Building DialogIntent");
+	            //Iterate and copy over all slots/values
 		        while (iter.hasNext()) {
 		        	    	
 		            Map.Entry pair = (Map.Entry)iter.next();
+		            
+		            //Create a new DialogSlot
 		            DialogSlot dialogSlot = new DialogSlot();
+		            
+		            //Create a new Slot
 		            Slot slot = (Slot) pair.getValue();
+		            
+		            //Set the name of the slot
 		            dialogSlot.setName(slot.getName());
+		            
+		            //Copy over the value if its already set
+		            if (slot.getValue() != null)
+		            	dialogSlot.setValue(slot.getValue());
+		            
+		            //Add this DialogSlot to the DialogSlots Hashmap.
 		            dialogSlots.put((String) pair.getKey(), dialogSlot);
+		            
 		            log.debug("DialogSlot " + (String) pair.getKey() + " with Name " + slot.getName() + " added.");
 		        }
 		        	    
+		        //Set the dialogSlots on the DialogIntent
 		        dialogIntent.setSlots(dialogSlots);
 		        	    
+		        //Create a DelegateDirective
 		        DelegateDirective dd = new DelegateDirective();
+		        
+		        //Add our new DialogIntent to the DelegateDirective
 		        dd.setUpdatedIntent(dialogIntent);
 		        	    
+		        //Directives must be provided as a List.  Add our DelegateDirective to the List.
 		        List<Directive> directiveList = new ArrayList<Directive>();
 		        directiveList.add(dd);
 	
+		        //Create a new SpeechletResponse and set the Directives to our List.
 		        SpeechletResponse speechletResp = new SpeechletResponse();
 		        speechletResp.setDirectives(directiveList);
+		        
+		        //Only end the session if we have all the info. Assuming we still need to 
+		        //get more, we keep the session open.
 		        speechletResp.setShouldEndSession(false);
+		        
+		        //Return the SpeechletResponse.
 		        return speechletResp;
 	        		
             } else if (dialogueState.equals(DialogState.COMPLETED)) {
 
-            	log.debug("onIntent, inside dialogueState IF statement");	
+            	log.debug("onIntent, inside dialogueState IF statement");
+            	//Generate our response and return.
             	return getHelloResponse(intent);
 	        	
-		    } else {
+		    } else { // dialogueState.equals(DialogState.IN_PROGRESS)
 		        		
 		        log.debug("onIntent, inside dialogueState ELSE statement");
+		        
+		        //Create an empty DelegateDirective
+		        //This will tell the Alexa Engine to keep collecting information.
 		        DelegateDirective dd = new DelegateDirective();
+		        
+		        //Directives must be provided as a List.  Add our DelegateDirective to the List.
 		        List<Directive> directiveList = new ArrayList<Directive>();
 		        directiveList.add(dd);
 		        
+		        //Create a new SpeechletResponse and set the Directives to our List.
 	            SpeechletResponse speechletResp = new SpeechletResponse();
 		        speechletResp.setDirectives(directiveList);
+		        
+		        //Only end the session if we have all the info. Assuming we still need to 
+		        //get more, we keep the session open.
 		        speechletResp.setShouldEndSession(false); 
+		        
+		        //Return the SpeechletResponse.
 		        return speechletResp;
             }
         } else if ("AMAZON.HelpIntent".equals(intentName)) {
