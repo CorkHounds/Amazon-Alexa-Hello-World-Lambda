@@ -7,5 +7,5 @@ This Hello World example demonstrates how to write a Skill for Amazon Alexa in J
 This repository is a companion to a blog on this subject, found at:
 https://blog.corkhounds.com/2017/07/09/coding-an-amazon-alexa-skill-in-java-using-the-dialog-directives/
 
-The project is offered without any licensing restrictions.
+The project is offered under the Apache 2.0 license.
 
